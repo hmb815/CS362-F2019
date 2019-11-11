@@ -874,6 +874,7 @@ int refac_ambassador(struct gameState *state, int choice1, int choice2, int hand
 
 int refac_tribute(struct gameState *state, int currentPlayer){
 
+  int i;
   int nextPlayer = currentPlayer + 1;
   int tributeRevealedCards[2] = {-1, -1};
 
@@ -969,7 +970,7 @@ int refac_mine(struct gameState *state, int currentPlayer, int choice1, int choi
       {
           discardCard(i, currentPlayer, state, 0);
           //second bug added: commented out break
-          //break;
+          break;
       }
   }
 }
@@ -1102,7 +1103,7 @@ int cardEffect(int card, int choice1, int choice2, int choice3, struct gameState
 
 
     case mine:
-    refac_mine(state, currentPlayer, choice1, choice2, handPos);
+        return refac_mine(state, currentPlayer, choice1, choice2, handPos);
 
     /******************* commented out after refactoring ************************
         j = state->hand[currentPlayer][choice1];  //store card we will trash
@@ -1190,7 +1191,7 @@ int cardEffect(int card, int choice1, int choice2, int choice3, struct gameState
         return 0;
 
     case baron:
-    refac_baron(state, choice1, currentPlayer);
+        return refac_baron(state, choice1, currentPlayer);
 
     /******************* commented out after refactoring **************************
         state->numBuys++;//Increase buys by 1!
@@ -1258,7 +1259,7 @@ int cardEffect(int card, int choice1, int choice2, int choice3, struct gameState
 
 
     case minion:
-    refac_minion(state, handPos, currentPlayer, choice1, choice2);
+        return refac_minion(state, handPos, currentPlayer, choice1, choice2);
 
 /****************** commented out after refactoring **************************
         //+1 action
@@ -1336,7 +1337,7 @@ int cardEffect(int card, int choice1, int choice2, int choice3, struct gameState
         return 0;
 
     case tribute:
-    refac_tribute(state, currentPlayer);
+        return refac_tribute(state, currentPlayer);
 
 /***************** commented out after refactoring ****************************
         if ((state->discardCount[nextPlayer] + state->deckCount[nextPlayer]) <= 1) {
@@ -1400,7 +1401,7 @@ int cardEffect(int card, int choice1, int choice2, int choice3, struct gameState
 
 
     case ambassador:
-    refac_ambassador(state, choice1, choice2, handPos, currentPlayer);
+        return refac_ambassador(state, choice1, choice2, handPos, currentPlayer);
 
 /******************* commented out after refactoring ****************************
         j = 0;		//used to check if player has enough cards to discard

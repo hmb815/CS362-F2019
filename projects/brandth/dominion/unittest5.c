@@ -1,4 +1,8 @@
 //unit test 5 is testing the mine function
+//may trash a treasure from your hand.
+//Gain a treasure to your hand costing up to 3 more than it
+
+
 
 #include "dominion.h"
 #include "dominion_helpers.h"
@@ -6,126 +10,67 @@
 #include <stdio.h>
 #include <assert.h>
 #include "rngs.h"
-#include <stdlib.h>
 
-#define TESTCARD "mine"
-
-int main() {
-    int count = 0;
-    int assertTotal = 0;
-    int deckCount = 0;
-    int handCount = 0;
-    int discardCount = 0;
-    int oldCardPresent, newCardPresent;
-    int m, supply, oldCardExpected, newCardExpected;
-    int handpos = 0, choice1 = 0, choice2 = 0, choice3 = 0, bonus = 0;
+int main() 
+{
+    int i;
+    int r;
     int seed = 1000;
-    int numPlayers = 2;
-    int thisPlayer = 0;
-	struct gameState G, testG;
-	int k[10] = {adventurer, embargo, village, minion, mine, cutpurse,
-			sea_hag, tribute, smithy, council_room};
-    int tCardSizeOne = 4;
-    int tCardSize = 6; // Number of cards to test gaining
-    int tCardsOne[4] = {copper, silver, gold, feast};
-    int tCards[6] = {great_hall, duchy, province, copper, silver, gold};
-    
-    // initialize a game state and player cards
-    initializeGame(numPlayers, k, seed, &G);
-    G.whoseTurn = thisPlayer;
-    
-    //Set the initial Hnad to all estates
-    G.handCount[thisPlayer] = 5;
-    for(int i = 0; i < 5; i++){
-        G.hand[thisPlayer][i] = estate;
-    }
-    
-	printf("----------------- Testing Card: %s ----------------\n", TESTCARD);
-    for(int i = 0; i < tCardSizeOne; i++){
-        for(int j = 0; j < tCardSize; j++){
-            count++;
-            // ----------- TEST 1: +2 coin cards at top of deck --------------
-            printf("TEST %d: = %d card for %d\n", count, tCardsOne[i], tCards[j]);
+    int numPlayers = 4;
+    int currPlayer = 0;
+    int handCount = 0;
+    int deckCount = 0;
+    int discardCount = 0;
+    struct gameState state, testState;
+    int treasure[3] = {copper, silver, gold};
+    int k[10] = {adventurer, minion, feast, gardens, mine,
+                    ambassador, smithy, village, baron, tribute};
 
-            // copy the game state to a test case
-            memcpy(&testG, &G, sizeof(struct gameState));
-            
-            // We will be trying to trash the card in hand position 1 and make sure that there is enough supply.
-            handpos = 1;
-            choice1 = handpos;
-            choice2 = tCards[j];
-            testG.hand[thisPlayer][handpos] = tCardsOne[i];
-            testG.supplyCount[tCards[j]] = 10;
-            
-            cardEffect(mine, choice1, choice2, choice3, &testG, handpos, &bonus);
-            
-            handCount = G.handCount[thisPlayer];
-            deckCount = G.deckCount[thisPlayer];
-            discardCount = G.discardCount[thisPlayer];
-            
-            if((getCost(tCards[j]) <= getCost(tCardsOne[i]) + 3) &&
-               (tCardsOne[i] == copper || tCardsOne[i] == silver || tCardsOne[i] == gold) && (tCards[j] == copper || tCards[j] == silver || tCards[j] == gold) ){
-                supply = 9;
-                if(tCardsOne[i] == tCards[j])
-                {
-                    newCardExpected = true;
-                    oldCardExpected = true;
-                }
-        
-                else
-                {
-                    newCardExpected = true;
-                    oldCardExpected = false;
-                }
-                
-            }else{
-                supply = 10;
-                newCardExpected = false;
-                oldCardExpected = true;
-                
-                if(tCardsOne[i] == tCards[j])
-                {
-                    newCardExpected = true;
-                    oldCardExpected = true;
-                }
-            }
-            
-            //Test if the old card is present and if the new card is present
-            oldCardPresent = newCardPresent = false;
-            
-            for(m = 0; m < testG.handCount[thisPlayer]; m++){
-                if(testG.hand[thisPlayer][m] == tCardsOne[i])
-                {
-                    oldCardPresent = true;
-                }
-                if(testG.hand[thisPlayer][m] == tCards[j]){
-                    newCardPresent = true;
-                }
-                
-            }
-            
-            printf("New card cost = %d, max cost = %d\n", getCost(tCards[j]), getCost(tCardsOne[i]) + 3);
-            printf("hand count = %d, expected = %d\n", testG.handCount[thisPlayer], handCount);
-            printf("deck count = %d, expected = %d\n", testG.deckCount[thisPlayer], deckCount);
-            printf("discard count = %d, expected = %d\n", testG.discardCount[thisPlayer],discardCount);
-            printf("card supply = %d, expected = %d\n", testG.supplyCount[tCards[j]],supply);
-            printf("Old card still in hand = %d, expected = %d\n", oldCardPresent, oldCardExpected);
-            printf("New card in hand = %d, expected = %d\n", newCardPresent, newCardExpected);
-            assertTotal += customAssert(testG.handCount[thisPlayer] == handCount);
-            assertTotal += customAssert(testG.deckCount[thisPlayer] == deckCount);
-            assertTotal += customAssert(testG.discardCount[thisPlayer] == discardCount);
-            assertTotal += customAssert(testG.supplyCount[tCards[j]] == supply);
-            assertTotal += customAssert(oldCardPresent == oldCardExpected);
-            assertTotal += customAssert(newCardPresent == newCardExpected);
-            printf("\n");
-        }
-    }
-    if(assertTotal == 0){
-        printf("\n >>>>> SUCCESS: Testing complete %s <<<<<\n\n", TESTCARD);
-    }
-    else{
-        printf("\n >>>>> FAILURE: Testing complete %s <<<<<\n\n", TESTCARD);
-    }
+    printf("Begin Testing Mine Card\n");
+    //set game state
+    r = initializeGame(numPlayers, k, seed, &state);
+    if (r == -1)
+        printf("ERROR - Game initialization failed.\n"); 
+    memcpy(&testState, &state, sizeof(struct gameState));
 
-	return 0;
+    //give Mine card to player
+    testState.hand[currPlayer][testState.handCount[currPlayer]] = mine;
+    testState.handCount[currPlayer]++;
+    if (state.handCount[currPlayer] + 1 == testState.handCount[currPlayer])
+        printf("PASSED - Mine card given to player.\n");
+    else
+        printf("ERROR - Mine card not given.\n");
+
+    //call refactored function
+    refac_mine(&testState, currPlayer, 0, 0, 0);
+
+    handCount = state.handCount[currPlayer];
+    deckCount = state.deckCount[currPlayer];
+    discardCount = state.discardCount[currPlayer];
+    
+    //check if treasure +3 was gained
+    if((getCost(state.handCount[currPlayer](treasure[i])) + 3) == (getCost(testState.handCount[currPlayer](treasure[i]))))
+        printf("SUCCESS - Player revealed treasure and gained +3\n");
+    else
+        printf("ERROR - Player revealed treasure and did not gain +3\n");
+
+
+    //Check if treasure was discarded
+	if(state.discardCount(treasure[i]) == testState.discardCount(treasure[i]))
+		printf("PASSED - treasure card was discarded\n");	
+	else
+		printf("ERROR - treasure card was not discarded.\n");
+
+
+    //Check if card was discarded
+	if(state.discardCount[currPlayer] == testState.discardCount[currPlayer])
+		printf("PASSED - Mine card was discarded\n");	
+	else
+		printf("ERROR - Mine card was not discarded.\n");
+
+
+    printf("Mine Card Test Complete\n\n");
+
+    return 0;
+   
 }
