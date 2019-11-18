@@ -1,2 +1,7 @@
-run make all #To compile the dominion code
-run ./playdom 30 # to run playdom code
+To compile run
+    make all
+To run game
+    ./playdom <number>
+To get code coverage
+    make randomtestresults
+
