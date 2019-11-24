@@ -8,6 +8,7 @@
  * if revealed card is action card, +2 actions
  *      if treature card, +2 coins
  *      if victory card, +2 cards 
+ * Fixed for assignment 5
 **********************************************************************/
 
 #include "dominion.h"

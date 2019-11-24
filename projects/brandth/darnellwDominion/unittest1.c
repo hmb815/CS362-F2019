@@ -5,6 +5,7 @@
  * Testing baron card function
  * +1 buy
  * discard Estate for +4 OR gain an Estate
+ * Fixed for assignment 5
 **********************************************************************/
 
 #include "dominion.h"

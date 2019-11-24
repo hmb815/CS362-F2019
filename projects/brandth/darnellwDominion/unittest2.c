@@ -7,6 +7,7 @@
  * choose 1: +2 coins
  * OR discard hand, +4 cards, and each other player with at least 5 cards in hand
  *      discard their hand and draws 4 cards
+ * Fixed for assignment 5
 **********************************************************************/  
 
 #include "dominion.h"
